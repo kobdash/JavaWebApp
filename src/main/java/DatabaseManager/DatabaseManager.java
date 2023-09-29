@@ -19,19 +19,26 @@ public class DatabaseManager {
 
 
 
-    private static final String DB_URL = "jdbc:mysql://localhost:3306/JavaWebAppDB";
+    private static final String DB_URL = "jdbc:mysql://localhost:3306/JavaWeAppDatabase";
     private static final String DB_USER = "jeff";
     private static final String DB_PASSWORD = "jeff";
 
-    public static Connection getConnection() {
-        try {
-            Class.forName("com.mysql.cj.jdbc.Driver");
-            return DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD);
-        } catch (ClassNotFoundException | SQLException e) {
-            e.printStackTrace(); // Handle this exception appropriately
-            return null;
-        }
+  
+    
+public static Connection getConnection() throws SQLException {
+    Connection connection = null;
+
+    try {
+        Class.forName("com.mysql.cj.jdbc.Driver");
+        connection = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD);
+    } catch (ClassNotFoundException e) {
+        throw new RuntimeException("Database driver not found.", e);
+    } catch (SQLException e) {
+        throw new RuntimeException("Connection to the database failed.", e);
     }
+
+    return connection;
+}
 
     public static List<Product> searchProducts(String query) {
         List<Product> searchResults = new ArrayList<>();
