@@ -1,6 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ page import="java.util.List" %>
 <%@ page import="model.Product" %>
+<%@ page import="servlets.HomeServlet" %>
 
 <!DOCTYPE html>
 <html>
@@ -42,13 +43,14 @@
             for (int i = startIndex; i < endIndex; i++) {
                 Product product = products.get(i);
         %>
-        <tr>
-            <td><%= product.getProductId() %></td>
-            <td><%= product.getProductName() %></td>
-            <td><%= product.getDescription() %></td>
-            <td><%= product.getPrice() %></td>
-            <td><%= product.getCategoryId() %></td>
-        </tr>
+           <tr>
+        <td><%= product.getProductId() %></td>
+        <!-- Make the product name clickable -->
+        <td><a href="ProductDetailsServlet?productId=<%= product.getProductId() %>"><%= product.getProductName() %></a></td>
+        <td><%= product.getDescription() %></td>
+        <td><%= product.getPrice() %></td>
+        <td><%= product.getCategoryId() %></td>
+    </tr>
         <% } %>
     </table>
 

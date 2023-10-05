@@ -16,6 +16,14 @@ public class Product {
         // Default constructor
     }
 
+    
+    public Product(String productName, String description, double price, int categoryId) {
+        this.productName = productName;
+        this.description = description;
+        this.price = price;
+        this.categoryId = categoryId;
+    }
+
     public Product(int productId, String productName, String description, double price, int categoryId) {
         this.productId = productId;
         this.productName = productName;
