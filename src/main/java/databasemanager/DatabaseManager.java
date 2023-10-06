@@ -162,6 +162,98 @@ public static boolean addProduct(Product product) {
     return false; // Product not added or an error occurred
 }
 
+public static List<Product> searchByName(String productName) {
+    List<Product> searchResults = new ArrayList<>();
+
+    try (Connection connection = getConnection()) {
+        String sql = "SELECT * FROM products WHERE LOWER(product_name) LIKE LOWER(?)";
+        
+        try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+            // Set the search parameter with wildcard characters (%) to perform a partial match
+            preparedStatement.setString(1, "%" + productName + "%");
+
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            while (resultSet.next()) {
+                int productId = resultSet.getInt("product_id");
+                String productNameFromDB = resultSet.getString("product_name");
+                String description = resultSet.getString("description");
+                double price = resultSet.getDouble("price");
+                int categoryIdFromDB = resultSet.getInt("category_id");
+
+                Product product = new Product(productId, productNameFromDB, description, price, categoryIdFromDB);
+                searchResults.add(product);
+            }
+        }
+    } catch (SQLException e) {
+        e.printStackTrace();
+        // Handle database-related exceptions here
+    }
+
+    return searchResults;
+}
+
+public static List<Product> searchByCategory(int categoryId) {
+    List<Product> searchResults = new ArrayList<>();
+
+    try (Connection connection = getConnection()) {
+        String sql = "SELECT * FROM products WHERE category_id = ?";
+        
+        try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+            preparedStatement.setInt(1, categoryId);
+
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            while (resultSet.next()) {
+                int productId = resultSet.getInt("product_id");
+                String productName = resultSet.getString("product_name");
+                String description = resultSet.getString("description");
+                double price = resultSet.getDouble("price");
+                int categoryIdFromDB = resultSet.getInt("category_id");
+
+                Product product = new Product(productId, productName, description, price, categoryIdFromDB);
+                searchResults.add(product);
+            }
+        }
+    } catch (SQLException e) {
+        e.printStackTrace();
+        // Handle database-related exceptions here
+    }
+
+    return searchResults;
+}
+public static List<Product> searchByPriceRange(double minPrice, double maxPrice) {
+    List<Product> searchResults = new ArrayList<>();
+
+    try (Connection connection = getConnection()) {
+        String sql = "SELECT * FROM products WHERE price >= ? AND price <= ?";
+        
+        try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+            preparedStatement.setDouble(1, minPrice);
+            preparedStatement.setDouble(2, maxPrice);
+
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            while (resultSet.next()) {
+                int productId = resultSet.getInt("product_id");
+                String productName = resultSet.getString("product_name");
+                String description = resultSet.getString("description");
+                double price = resultSet.getDouble("price");
+                int categoryIdFromDB = resultSet.getInt("category_id");
+
+                Product product = new Product(productId, productName, description, price, categoryIdFromDB);
+                searchResults.add(product);
+            }
+        }
+    } catch (SQLException e) {
+        e.printStackTrace();
+        // Handle database-related exceptions here
+    }
+
+    return searchResults;
+}
+ 
+
 }
 
   

@@ -12,6 +12,11 @@ import jakarta.servlet.http.HttpServletResponse;
 
 public class AddProductServlet extends HttpServlet {
     private static final long serialVersionUID = 1L;
+    
+     protected void doGet(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+         request.getRequestDispatcher("/JSP/add-product.jsp").forward(request, response);
+     }
 
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -28,13 +33,13 @@ public class AddProductServlet extends HttpServlet {
             // Add the new product to the database using DatabaseManager
             boolean success = DatabaseManager.addProduct(newProduct);
 
-            if (success) {
+           /* if (success) {
                 // Redirect to a success page or display a success message
                 response.sendRedirect("success.jsp");
             } else {
                 // Redirect to an error page or display an error message
                 response.sendRedirect("error.jsp");
-            }
+            }*/
         } catch (Exception e) {
             e.printStackTrace();
             // Handle exceptions as needed

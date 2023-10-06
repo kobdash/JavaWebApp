@@ -44,29 +44,49 @@
                 Product product = products.get(i);
         %>
            <tr>
-        <td><%= product.getProductId() %></td>
-        <!-- Make the product name clickable -->
-        <td><a href="ProductDetailsServlet?productId=<%= product.getProductId() %>"><%= product.getProductName() %></a></td>
-        <td><%= product.getDescription() %></td>
-        <td><%= product.getPrice() %></td>
-        <td><%= product.getCategoryId() %></td>
-    </tr>
+                <td><%= product.getProductId() %></td>
+                <!-- Make the product name clickable -->
+                <td><a href="ProductDetailsServlet?productId=<%= product.getProductId() %>"><%= product.getProductName() %></a></td>
+                <td><%= product.getDescription() %></td>
+                <td><%= product.getPrice() %></td>
+                <td><%= product.getCategoryId() %></td>
+            </tr>
         <% } %>
     </table>
 
     <div class="pagination">
         <%
-int totalPages = (int) Math.ceil((double) products.size() / (double) itemsPerPage);
-for (int pageNumber = 1; pageNumber <= totalPages; pageNumber++) {
-    String activeClass = (pageNumber == currentPage) ? "active" : "";
-%>
-<a class="<%= activeClass %>" href="HomeServlet?page=<%= pageNumber %>"><%= pageNumber %></a>
-<%
-}
-%>
+        int totalPages = (int) Math.ceil((double) products.size() / (double) itemsPerPage);
+        for (int pageNumber = 1; pageNumber <= totalPages; pageNumber++) {
+            String activeClass = (pageNumber == currentPage) ? "active" : "";
+        %>
+        <a class="<%= activeClass %>" href="HomeServlet?page=<%= pageNumber %>"><%= pageNumber %></a>
+        <%
+        }
+        %>
+    </div>
+    
+    <div>
+        <form action="HomeServlet" method="post">
+            <label for="searchQuery">Search:</label>
+            <input type="text" id="searchQuery" name="searchQuery">
+            <label for="categoryId">Category:</label>
+            <!-- Add a dropdown for selecting a category if needed -->
+            <select id="categoryId" name="categoryId">
+                <!-- Populate the dropdown options with categories if necessary -->
+                 <option value="0">Select Category</option>
+                <option value="1">Category 1</option>
+                <option value="2">Category 2</option>
+                <!-- Add more options as needed -->
+            </select>
+            <label for="minPrice">Min Price:</label>
+            <input type="text" id="minPrice" name="minPrice">
+            <label for="maxPrice">Max Price:</label>
+            <input type="text" id="maxPrice" name="maxPrice">
+            <button type="submit">Search</button>
+        </form>
     </div>
 </body>
 </html>
-
 
 

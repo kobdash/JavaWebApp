@@ -16,6 +16,8 @@ import java.util.ArrayList;
 
 public class HomeServlet extends HttpServlet {
  private static final long serialVersionUID = 1L;
+
+
      
    protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -37,8 +39,40 @@ public class HomeServlet extends HttpServlet {
     // ... (other methods and code)
 
 
-    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        // Handle POST requests if needed
+  protected void doPost(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+    try {
+        // Retrieve search parameters from the request
+        String productName = request.getParameter("searchQuery");
+        int categoryId = Integer.parseInt(request.getParameter("categoryId"));
+        String minPriceStr = request.getParameter("minPrice");
+        String maxPriceStr = request.getParameter("maxPrice");
+        double minPrice = Double.parseDouble(minPriceStr);
+        double maxPrice = Double.parseDouble(maxPriceStr);
+
+        
+ 
+          List<Product> searchResults = new ArrayList<>();
+        
+        if (!productName.isEmpty()) {
+    searchResults = DatabaseManager.searchByName(productName);
+        }
+        else if (categoryId != 0) {
+    searchResults = DatabaseManager.searchByCategory(categoryId);
+}
+       else if (minPrice != 0.0 && maxPrice != 0.0) {
+    searchResults = DatabaseManager.searchByPriceRange(minPrice, maxPrice);
+}
+     request.setAttribute("products", searchResults);
+
+        // Forward the request to the "home.jsp" page for display
+        request.getRequestDispatcher("/JSP/home.jsp").forward(request, response);
+        
+    } catch (Exception e) {
+        e.printStackTrace();
+        // Handle exceptions as needed
     }
+    
+}
  
 }
