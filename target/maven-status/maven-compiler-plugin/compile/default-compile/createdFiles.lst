@@ -3,6 +3,5 @@ com/mycompany/javaweb/JakartaRestConfiguration.class
 model/Product.class
 servlets/HomeServlet.class
 servlets/ProductDetailsServlet.class
-servlets/SearchServlet.class
 com/mycompany/javaweb/resources/JakartaEE10Resource.class
 databasemanager/DatabaseManager.class

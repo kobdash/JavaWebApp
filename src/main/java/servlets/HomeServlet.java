@@ -44,7 +44,7 @@ public class HomeServlet extends HttpServlet {
     try {
         // Retrieve search parameters from the request
         String productName = request.getParameter("searchQuery");
-        int categoryId = Integer.parseInt(request.getParameter("categoryId"));
+        String categoryName =  request.getParameter("categoryName");
         String minPriceStr = request.getParameter("minPrice");
         String maxPriceStr = request.getParameter("maxPrice");
         double minPrice = Double.parseDouble(minPriceStr);
@@ -57,8 +57,8 @@ public class HomeServlet extends HttpServlet {
         if (!productName.isEmpty()) {
     searchResults = DatabaseManager.searchByName(productName);
         }
-        else if (categoryId != 0) {
-    searchResults = DatabaseManager.searchByCategory(categoryId);
+        else if (!categoryName.isEmpty()) {
+    searchResults = DatabaseManager.searchByCategory(categoryName);
 }
        else if (minPrice != 0.0 && maxPrice != 0.0) {
     searchResults = DatabaseManager.searchByPriceRange(minPrice, maxPrice);

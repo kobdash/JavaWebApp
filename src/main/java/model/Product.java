@@ -2,7 +2,13 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
+
+
+
 package model;
+import java.util.List;
+
+
 
 public class Product {
     private int productId;
@@ -10,29 +16,74 @@ public class Product {
     private String description;
     private double price;
     private int categoryId;
+    private String categoryName;
+    private List<String> imageUrls;
 
     // Constructors
     public Product() {
         // Default constructor
     }
+    
 
     
-    public Product(String productName, String description, double price, int categoryId) {
+    public Product(String productName, String description, double price, String categoryName) {
         this.productName = productName;
         this.description = description;
         this.price = price;
-        this.categoryId = categoryId;
+        this.categoryName = categoryName;
     }
+    
+    public Product(String productName, String description,double price){
+     this.productName = productName;
+        this.description = description;
+        this.price = price;
+    
+    }
+    
+   
 
-    public Product(int productId, String productName, String description, double price, int categoryId) {
+    public Product(int productId, String productName, String description, double price, String categoryName) {
         this.productId = productId;
         this.productName = productName;
         this.description = description;
         this.price = price;
-        this.categoryId = categoryId;
+        this.categoryName = categoryName;
+    }
+    
+    
+    public Product(int productId, String productName, String description, double price, String categoryName, List<String> imageUrls) {
+        this.productId = productId;
+        this.productName = productName;
+        this.description = description;
+        this.price = price;
+        this.categoryName = categoryName;
+        this.imageUrls = imageUrls;
+    }
+    
+    
+    
+    public Product(String productName, String description, double price, String categoryName, List<String> imageUrls) {
+        this.productName = productName;
+        this.description = description;
+        this.price = price;
+        this.categoryName = categoryName;
+        this.imageUrls = imageUrls;
     }
 
+
+
+
     // Getters and setters
+    
+   public List<String> getImageUrls() {
+        return imageUrls;
+    }
+
+    public void setImageUrls(List<String> imageUrls) {
+        this.imageUrls = imageUrls;
+    }
+    
+    
     public int getProductId() {
         return productId;
     }
@@ -65,17 +116,18 @@ public class Product {
         this.price = price;
     }
 
-    public int getCategoryId() {
-        return categoryId;
+     public String getCategoryName() {
+        return categoryName;
     }
 
-    public void setCategoryId(int categoryId) {
-        this.categoryId = categoryId;
+    public void setCategoryId(String categoryName) {
+        this.categoryName = categoryName;
     }
+
 
     @Override
     public String toString() {
         return "Product [productId=" + productId + ", productName=" + productName + ", description=" + description
-                + ", price=" + price + ", categoryId=" + categoryId + "]";
+                + ", price=" + price + ", categoryName=" + categoryName + "]";
     }
 }

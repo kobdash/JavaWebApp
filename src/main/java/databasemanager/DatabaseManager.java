@@ -59,10 +59,10 @@ public static List<Product> getProducts() {
                 String productName = resultSet.getString("product_name");
                 String description = resultSet.getString("description");
                 double price = resultSet.getDouble("price");
-                int categoryId = resultSet.getInt("category_id");
+                String categoryName = resultSet.getString("category_name");
 
                 // Create a Product object and add it to the list
-                Product product = new Product(productId, productName, description, price, categoryId);
+                Product product = new Product(productId, productName, description, price, categoryName);
                 products.add(product);
             }
         } catch (SQLException e) {
@@ -101,10 +101,10 @@ public static Product getProductDetails(int productId) {
             String productName = resultSet.getString("product_name");
             String description = resultSet.getString("description");
             double price = resultSet.getDouble("price");
-            int categoryId = resultSet.getInt("category_id");
+            String categoryName = resultSet.getString("category_name");
 
             // Create a Product object with the retrieved details
-            product = new Product(productId, productName, description, price, categoryId);
+            product = new Product(productId, productName, description, price, categoryName);
         }
     } catch (SQLException e) {
         e.printStackTrace();
@@ -123,34 +123,31 @@ public static Product getProductDetails(int productId) {
 
     return product;
 }
-public static boolean addProduct(Product product) {
+
+public static List<String> getProductImages(int productId) {
+    List<String> imageUrls = new ArrayList<>();
     Connection connection = null;
     PreparedStatement preparedStatement = null;
+    ResultSet resultSet = null;
 
     try {
         connection = getConnection();
-        String query = "INSERT INTO products (product_name, description, price, category_id) VALUES (?, ?, ?, ?)";
+        String query = "SELECT image_url FROM product_images WHERE product_id = ?";
         preparedStatement = connection.prepareStatement(query);
+        preparedStatement.setInt(1, productId);
+        resultSet = preparedStatement.executeQuery();
 
-        // Set the values for the placeholders in the SQL query
-        preparedStatement.setString(1, product.getProductName());
-        preparedStatement.setString(2, product.getDescription());
-        preparedStatement.setDouble(3, product.getPrice());
-        preparedStatement.setInt(4, product.getCategoryId());
-
-        // Execute the INSERT statement
-        int rowsAffected = preparedStatement.executeUpdate();
-
-        // Check if the product was added successfully (at least one row affected)
-        if (rowsAffected > 0) {
-            return true; // Product added successfully
+        while (resultSet.next()) {
+            String imageUrl = resultSet.getString("image_url");
+            imageUrls.add(imageUrl);
         }
     } catch (SQLException e) {
         e.printStackTrace();
-        // Handle the exception as needed
+        // Handle database-related exceptions here
     } finally {
         // Close resources
         try {
+            if (resultSet != null) resultSet.close();
             if (preparedStatement != null) preparedStatement.close();
             if (connection != null) connection.close();
         } catch (SQLException e) {
@@ -159,8 +156,124 @@ public static boolean addProduct(Product product) {
         }
     }
 
-    return false; // Product not added or an error occurred
+    return imageUrls;
 }
+
+
+public static boolean addProduct(Product product, List<String> imageUrls, String categoryName) {
+    Connection connection = null;
+    PreparedStatement preparedStatement = null;
+
+    try {
+        connection = getConnection();
+        connection.setAutoCommit(false); // Enable transaction
+
+        // First, add the product to the 'products' table
+        String insertProductSQL = "INSERT INTO products (product_name, description, price, category_id) VALUES (?, ?, ?, (SELECT category_id FROM categories WHERE category_name = ?))";
+        preparedStatement = connection.prepareStatement(insertProductSQL, Statement.RETURN_GENERATED_KEYS);
+
+        preparedStatement.setString(1, product.getProductName());
+        preparedStatement.setString(2, product.getDescription());
+        preparedStatement.setDouble(3, product.getPrice());
+        preparedStatement.setString(4, categoryName);
+
+        int rowsAffected = preparedStatement.executeUpdate();
+
+        if (rowsAffected == 0) {
+            throw new SQLException("Creating product failed, no rows affected.");
+        }
+
+        // Retrieve the auto-generated product ID
+        ResultSet generatedKeys = preparedStatement.getGeneratedKeys();
+        int productId = -1;
+        if (generatedKeys.next()) {
+            productId = generatedKeys.getInt(1);
+        } else {
+            throw new SQLException("Creating product failed, no ID obtained.");
+        }
+
+        // Next, add the image URLs to the 'product_images' table
+        String insertImageSQL = "INSERT INTO product_images (product_id, image_url) VALUES (?, ?)";
+        preparedStatement = connection.prepareStatement(insertImageSQL);
+
+        for (String imageUrl : imageUrls) {
+            preparedStatement.setInt(1, productId);
+            preparedStatement.setString(2, imageUrl);
+            preparedStatement.addBatch();
+        }
+
+        int[] imageInsertCounts = preparedStatement.executeBatch();
+
+        // Commit the transaction
+        connection.commit();
+
+        // Check if the image insert counts are valid
+        for (int count : imageInsertCounts) {
+            if (count != 1) {
+                throw new SQLException("Adding image URLs failed, invalid insert count.");
+            }
+        }
+
+        return true; // Product and images added successfully
+    } catch (SQLException e) {
+        e.printStackTrace();
+        // Handle database-related exceptions here
+        try {
+            if (connection != null) {
+                connection.rollback(); // Rollback the transaction in case of an error
+            }
+        } catch (SQLException rollbackEx) {
+            rollbackEx.printStackTrace();
+        }
+    } finally {
+        // Close resources
+        try {
+            if (preparedStatement != null) preparedStatement.close();
+            if (connection != null) {
+                connection.setAutoCommit(true); // Revert to auto-commit mode
+                connection.close();
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    return false; // Product and/or images not added or an error occurred
+}
+ public static List<String> retrieveCategoriesFromDatabase() {
+        List<String> categories = new ArrayList<>();
+        Connection connection = null;
+        PreparedStatement preparedStatement = null;
+        ResultSet resultSet = null;
+
+        try {
+            connection = getConnection();
+            String query = "SELECT category_name FROM categories"; // Replace with your table name and column name
+            preparedStatement = connection.prepareStatement(query);
+            resultSet = preparedStatement.executeQuery();
+
+            while (resultSet.next()) {
+                String categoryName = resultSet.getString("category_name"); // Replace with your column name
+                categories.add(categoryName);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            // Handle database-related exceptions here
+        } finally {
+            // Close resources
+            try {
+                if (resultSet != null) resultSet.close();
+                if (preparedStatement != null) preparedStatement.close();
+                if (connection != null) connection.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+                // Handle the exception as needed
+            }
+        }
+
+        return categories;
+    }
+
 
 public static List<Product> searchByName(String productName) {
     List<Product> searchResults = new ArrayList<>();
@@ -179,9 +292,9 @@ public static List<Product> searchByName(String productName) {
                 String productNameFromDB = resultSet.getString("product_name");
                 String description = resultSet.getString("description");
                 double price = resultSet.getDouble("price");
-                int categoryIdFromDB = resultSet.getInt("category_id");
+                String categoryNameFromDB = resultSet.getString("category_name");
 
-                Product product = new Product(productId, productNameFromDB, description, price, categoryIdFromDB);
+                Product product = new Product(productId, productNameFromDB, description, price, categoryNameFromDB);
                 searchResults.add(product);
             }
         }
@@ -193,14 +306,14 @@ public static List<Product> searchByName(String productName) {
     return searchResults;
 }
 
-public static List<Product> searchByCategory(int categoryId) {
+public static List<Product> searchByCategory(String categoryName) {
     List<Product> searchResults = new ArrayList<>();
 
     try (Connection connection = getConnection()) {
         String sql = "SELECT * FROM products WHERE category_id = ?";
         
         try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
-            preparedStatement.setInt(1, categoryId);
+            preparedStatement.setString(1, categoryName);
 
             ResultSet resultSet = preparedStatement.executeQuery();
 
@@ -209,9 +322,9 @@ public static List<Product> searchByCategory(int categoryId) {
                 String productName = resultSet.getString("product_name");
                 String description = resultSet.getString("description");
                 double price = resultSet.getDouble("price");
-                int categoryIdFromDB = resultSet.getInt("category_id");
+               String categoryNameFromDB = resultSet.getString("category_name");
 
-                Product product = new Product(productId, productName, description, price, categoryIdFromDB);
+              Product product = new Product(productId, productName, description, price, categoryNameFromDB);
                 searchResults.add(product);
             }
         }
@@ -239,9 +352,9 @@ public static List<Product> searchByPriceRange(double minPrice, double maxPrice)
                 String productName = resultSet.getString("product_name");
                 String description = resultSet.getString("description");
                 double price = resultSet.getDouble("price");
-                int categoryIdFromDB = resultSet.getInt("category_id");
+                String categoryNameFromDB = resultSet.getString("category_name");
 
-                Product product = new Product(productId, productName, description, price, categoryIdFromDB);
+                 Product product = new Product(productId, productName, description, price, categoryNameFromDB);
                 searchResults.add(product);
             }
         }

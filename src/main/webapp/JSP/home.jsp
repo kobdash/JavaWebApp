@@ -18,7 +18,7 @@
             <th>Product Name</th>
             <th>Description</th>
             <th>Price</th>
-            <th>Category ID</th>
+            <th>Category Name</th>
         </tr>
         <% 
             List<Product> products = (List<Product>) request.getAttribute("products");
@@ -49,7 +49,7 @@
                 <td><a href="ProductDetailsServlet?productId=<%= product.getProductId() %>"><%= product.getProductName() %></a></td>
                 <td><%= product.getDescription() %></td>
                 <td><%= product.getPrice() %></td>
-                <td><%= product.getCategoryId() %></td>
+                <td><%= product.getCategoryName() %></td>
             </tr>
         <% } %>
     </table>
@@ -70,13 +70,20 @@
         <form action="HomeServlet" method="post">
             <label for="searchQuery">Search:</label>
             <input type="text" id="searchQuery" name="searchQuery">
-            <label for="categoryId">Category:</label>
+            <label for="categoryName">Category:</label>
             <!-- Add a dropdown for selecting a category if needed -->
-            <select id="categoryId" name="categoryId">
-                <!-- Populate the dropdown options with categories if necessary -->
-                 <option value="0">Select Category</option>
-                <option value="1">Category 1</option>
-                <option value="2">Category 2</option>
+            <select id="categoryName" name="categoryName">
+                
+                  <option value="" disabled selected>Select Category</option>
+                 <!-- Java code to retrieve and populate categories from the database -->
+            <% 
+                List<String> categories = databasemanager.DatabaseManager.retrieveCategoriesFromDatabase();// Implement this method
+                for (String category : categories) {
+            %>
+            <option value="<%= category %>"><%= category %></option>
+            <%
+                }
+            %>
                 <!-- Add more options as needed -->
             </select>
             <label for="minPrice">Min Price:</label>
