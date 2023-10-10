@@ -1,98 +1,53 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
-<%@ page import="java.util.List" %>
-<%@ page import="model.Product" %>
-<%@ page import="servlets.HomeServlet" %>
+<%@page import="java.util.List"%>
+<%@page import="databasemanager.DatabaseManager"%>
 
 <!DOCTYPE html>
 <html>
 <head>
     <meta charset="UTF-8">
-    <title>Product List</title>
+    <title>Add Product</title>
 </head>
 <body>
-    <h1>Product List</h1>
+    <h1>Add Product</h1>
 
-    <table border="1">
-        <tr>
-            <th>Product ID</th>
-            <th>Product Name</th>
-            <th>Description</th>
-            <th>Price</th>
-            <th>Category Name</th>
-        </tr>
-        <% 
-            List<Product> products = (List<Product>) request.getAttribute("products");
-            int itemsPerPage = 5;
-            int currentPage = 1;
+    <form action="AddProductServlet" method="post" enctype="multipart/form-data">
+        <label for="productName">Product Name:</label>
+        <input type="text" id="productName" name="productName" required><br>
 
-            // Get the current page parameter from the request
-            String pageParam = request.getParameter("page");
-            if (pageParam != null && !pageParam.isEmpty()) {
-                try {
-                    currentPage = Integer.parseInt(pageParam);
-                } catch (NumberFormatException e) {
-                    // Handle invalid page parameter
-                }
-            }
+        <label for="description">Description:</label>
+        <textarea id="description" name="description" required></textarea><br>
 
-            // Calculate the start and end index for pagination
-            int startIndex = (currentPage - 1) * itemsPerPage;
-            int endIndex = Math.min(startIndex + itemsPerPage, products.size());
+        <label for="price">Price:</label>
+        <input type="number" id="price" name="price" step="0.01" required><br>
 
-            // Loop through products for the current page
-            for (int i = startIndex; i < endIndex; i++) {
-                Product product = products.get(i);
-        %>
-           <tr>
-                <td><%= product.getProductId() %></td>
-                <!-- Make the product name clickable -->
-                <td><a href="ProductDetailsServlet?productId=<%= product.getProductId() %>"><%= product.getProductName() %></a></td>
-                <td><%= product.getDescription() %></td>
-                <td><%= product.getPrice() %></td>
-                <td><%= product.getCategoryName() %></td>
-            </tr>
-        <% } %>
-    </table>
+        <label for="imageUrl">Images:</label>
+        <input type="file" id="imageUrl" name="imageUrl" accept="image/*"><br>
 
-    <div class="pagination">
-        <%
-        int totalPages = (int) Math.ceil((double) products.size() / (double) itemsPerPage);
-        for (int pageNumber = 1; pageNumber <= totalPages; pageNumber++) {
-            String activeClass = (pageNumber == currentPage) ? "active" : "";
-        %>
-        <a class="<%= activeClass %>" href="HomeServlet?page=<%= pageNumber %>"><%= pageNumber %></a>
-        <%
-        }
-        %>
-    </div>
-    
-    <div>
-        <form action="HomeServlet" method="post">
-            <label for="searchQuery">Search:</label>
-            <input type="text" id="searchQuery" name="searchQuery">
-            <label for="categoryName">Category:</label>
-            <!-- Add a dropdown for selecting a category if needed -->
-            <select id="categoryName" name="categoryName">
-                
-                  <option value="" disabled selected>Select Category</option>
-                 <!-- Java code to retrieve and populate categories from the database -->
+        <label for="categoryName">Category:</label>
+        <select id="categoryName" name="categoryName">
+            <option value="" disabled selected>Select or Add Category</option>
             <% 
-                List<String> categories = databasemanager.DatabaseManager.retrieveCategoriesFromDatabase();// Implement this method
+                List<String> categories = DatabaseManager.retrieveCategoriesFromDatabase(); // Corrected method call
                 for (String category : categories) {
             %>
             <option value="<%= category %>"><%= category %></option>
             <%
                 }
             %>
-                <!-- Add more options as needed -->
-            </select>
-            <label for="minPrice">Min Price:</label>
-            <input type="text" id="minPrice" name="minPrice">
-            <label for="maxPrice">Max Price:</label>
-            <input type="text" id="maxPrice" name="maxPrice">
-            <button type="submit">Search</button>
-        </form>
-    </div>
+        </select><br>
+
+        <label for="CategoryName">New Category:</label>
+        <input type="text" id="CategoryName" name="CategoryName"><br>
+
+        <!-- Other form fields (e.g., additional details) -->
+
+        <button type="submit">Submit</button>
+    </form>
+    
+    <br><br>
+    
+    <a href="HomeServlet">Back to Product List</a>
 </body>
 </html>
 

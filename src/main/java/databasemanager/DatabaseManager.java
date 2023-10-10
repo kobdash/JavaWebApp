@@ -1,6 +1,7 @@
 
 package databasemanager;
 
+import java.io.InputStream;
 import model.Product;
 
 import java.sql.Connection;
@@ -83,6 +84,78 @@ public static List<Product> getProducts() {
         return products;
     }
 
+
+public static int getProductID(String productName) {
+    Connection connection = null;
+    PreparedStatement preparedStatement = null;
+    ResultSet resultSet = null;
+    int productId = -1; // Default value if not found
+
+    try {
+        connection = getConnection();
+
+        // Query to retrieve the product ID by product name
+        String selectProductIDSQL = "SELECT product_id FROM products WHERE product_name = ?";
+        preparedStatement = connection.prepareStatement(selectProductIDSQL);
+        preparedStatement.setString(1, productName);
+
+        resultSet = preparedStatement.executeQuery();
+
+        if (resultSet.next()) {
+            productId = resultSet.getInt("product_id");
+        }
+    } catch (SQLException e) {
+        e.printStackTrace();
+        // Handle database-related exceptions here
+    } finally {
+        // Close resources
+        try {
+            if (resultSet != null) resultSet.close();
+            if (preparedStatement != null) preparedStatement.close();
+            if (connection != null) connection.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    return productId;
+}
+
+public static int getMostRecentlyAddedProductID() {
+    Connection connection = null;
+    PreparedStatement preparedStatement = null;
+    ResultSet resultSet = null;
+    int productId = -1; // Default value if not found
+
+    try {
+        connection = getConnection();
+
+        // Query to retrieve the most recently added product's ID
+        String selectMostRecentProductIDSQL = "SELECT LAST_INSERT_ID() AS product_id";
+        preparedStatement = connection.prepareStatement(selectMostRecentProductIDSQL);
+        resultSet = preparedStatement.executeQuery();
+
+        if (resultSet.next()) {
+            productId = resultSet.getInt("product_id");
+        }
+    } catch (SQLException e) {
+        e.printStackTrace();
+        // Handle database-related exceptions here
+    } finally {
+        // Close resources
+        try {
+            if (resultSet != null) resultSet.close();
+            if (preparedStatement != null) preparedStatement.close();
+            if (connection != null) connection.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    return productId;
+}
+
+
 public static Product getProductDetails(int productId) {
     Connection connection = null;
     PreparedStatement preparedStatement = null;
@@ -159,23 +232,23 @@ public static List<String> getProductImages(int productId) {
     return imageUrls;
 }
 
-
-public static boolean addProduct(Product product, List<String> imageUrls, String categoryName) {
+public static boolean addProductToProductsTable(Product product) {
     Connection connection = null;
     PreparedStatement preparedStatement = null;
+    ResultSet generatedKeys = null;
 
     try {
         connection = getConnection();
         connection.setAutoCommit(false); // Enable transaction
 
-        // First, add the product to the 'products' table
-        String insertProductSQL = "INSERT INTO products (product_name, description, price, category_id) VALUES (?, ?, ?, (SELECT category_id FROM categories WHERE category_name = ?))";
+        // Add the product to the 'products' table
+        String insertProductSQL = "INSERT INTO products (product_name, description, price, category_name) VALUES (?, ?, ?, ?)";
         preparedStatement = connection.prepareStatement(insertProductSQL, Statement.RETURN_GENERATED_KEYS);
 
         preparedStatement.setString(1, product.getProductName());
         preparedStatement.setString(2, product.getDescription());
         preparedStatement.setDouble(3, product.getPrice());
-        preparedStatement.setString(4, categoryName);
+        preparedStatement.setString(4, product.getCategoryName());
 
         int rowsAffected = preparedStatement.executeUpdate();
 
@@ -184,37 +257,14 @@ public static boolean addProduct(Product product, List<String> imageUrls, String
         }
 
         // Retrieve the auto-generated product ID
-        ResultSet generatedKeys = preparedStatement.getGeneratedKeys();
-        int productId = -1;
+        generatedKeys = preparedStatement.getGeneratedKeys();
         if (generatedKeys.next()) {
-            productId = generatedKeys.getInt(1);
+            // Commit the transaction
+            connection.commit();
+            return true; // Product added successfully
         } else {
             throw new SQLException("Creating product failed, no ID obtained.");
         }
-
-        // Next, add the image URLs to the 'product_images' table
-        String insertImageSQL = "INSERT INTO product_images (product_id, image_url) VALUES (?, ?)";
-        preparedStatement = connection.prepareStatement(insertImageSQL);
-
-        for (String imageUrl : imageUrls) {
-            preparedStatement.setInt(1, productId);
-            preparedStatement.setString(2, imageUrl);
-            preparedStatement.addBatch();
-        }
-
-        int[] imageInsertCounts = preparedStatement.executeBatch();
-
-        // Commit the transaction
-        connection.commit();
-
-        // Check if the image insert counts are valid
-        for (int count : imageInsertCounts) {
-            if (count != 1) {
-                throw new SQLException("Adding image URLs failed, invalid insert count.");
-            }
-        }
-
-        return true; // Product and images added successfully
     } catch (SQLException e) {
         e.printStackTrace();
         // Handle database-related exceptions here
@@ -229,6 +279,7 @@ public static boolean addProduct(Product product, List<String> imageUrls, String
         // Close resources
         try {
             if (preparedStatement != null) preparedStatement.close();
+            if (generatedKeys != null) generatedKeys.close();
             if (connection != null) {
                 connection.setAutoCommit(true); // Revert to auto-commit mode
                 connection.close();
@@ -238,8 +289,44 @@ public static boolean addProduct(Product product, List<String> imageUrls, String
         }
     }
 
-    return false; // Product and/or images not added or an error occurred
+    return false; // Error occurred or product not added
 }
+
+public static boolean addProductToCategoriesTable(String categoryName) {
+    Connection connection = null;
+    PreparedStatement preparedStatement = null;
+
+    try {
+        connection = getConnection();
+
+        // Add the category to the 'categories' table
+        String insertCategorySQL = "INSERT INTO categories (category_name) VALUES (?)";
+        preparedStatement = connection.prepareStatement(insertCategorySQL);
+
+        preparedStatement.setString(1, categoryName);
+
+        int rowsAffected = preparedStatement.executeUpdate();
+
+        // Check if the category was added successfully
+        return rowsAffected > 0;
+    } catch (SQLException e) {
+        e.printStackTrace();
+        // Handle database-related exceptions here
+    } finally {
+        // Close resources
+        try {
+            if (preparedStatement != null) preparedStatement.close();
+            if (connection != null) connection.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    return false; // Error occurred or category not added
+}
+
+
+
  public static List<String> retrieveCategoriesFromDatabase() {
         List<String> categories = new ArrayList<>();
         Connection connection = null;
@@ -274,6 +361,42 @@ public static boolean addProduct(Product product, List<String> imageUrls, String
         return categories;
     }
 
+ 
+public static boolean saveImageToProductImages(int productId, InputStream imageInputStream) {
+    Connection connection = null;
+    PreparedStatement preparedStatement = null;
+
+    try {
+        connection = getConnection(); // Assuming you have a method to obtain a database connection
+
+        // Insert the image data into the product_images table
+        String insertImageSQL = "INSERT INTO product_images (product_id, image_data) VALUES (?, ?)";
+        preparedStatement = connection.prepareStatement(insertImageSQL);
+
+        preparedStatement.setInt(1, productId);
+        preparedStatement.setBinaryStream(2, imageInputStream);
+
+        int rowsAffected = preparedStatement.executeUpdate();
+
+        // Check if the image insert was successful (1 row affected)
+        if (rowsAffected == 1) {
+            return true; // Image data added successfully
+        }
+    } catch (SQLException e) {
+        e.printStackTrace();
+        // Handle database-related exceptions here
+    } finally {
+        // Close resources
+        try {
+            if (preparedStatement != null) preparedStatement.close();
+            if (connection != null) connection.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    return false; // Image data not added or an error occurred
+}
 
 public static List<Product> searchByName(String productName) {
     List<Product> searchResults = new ArrayList<>();

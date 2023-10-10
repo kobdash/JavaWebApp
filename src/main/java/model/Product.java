@@ -15,7 +15,6 @@ public class Product {
     private String productName;
     private String description;
     private double price;
-    private int categoryId;
     private String categoryName;
     private List<String> imageUrls;
 

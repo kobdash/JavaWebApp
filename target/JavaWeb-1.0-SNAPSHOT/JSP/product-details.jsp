@@ -15,6 +15,7 @@
 
         if (product != null) {
     %>
+  
     <table border="1">
         <tr>
             <th>Product ID</th>
@@ -35,10 +36,12 @@
     <h2>Product Images</h2>
     <div>
         <%
-            for (String imageUrl : imageUrls) {
+            if (imageUrls != null) {  // Check if imageUrls is not null
+                for (String imageUrl : imageUrls) {
         %>
         <img src="<%= imageUrl %>" alt="Product Image" style="max-width: 300px; margin: 10px;">
         <%
+                }
             }
         %>
     </div>

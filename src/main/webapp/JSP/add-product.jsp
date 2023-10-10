@@ -1,6 +1,9 @@
+
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@page import="java.util.List"%>
 <%@page import="databasemanager.DatabaseManager"%>
-<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@page import="servlets.AddProductServlet"%>
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -10,7 +13,8 @@
 <body>
     <h1>Add Product</h1>
 
-    <form action="AddProductServlet" method="post" enctype="multipart/form-data">
+   <!-- -->
+    <form action="AddProductServlet" method="post"  >
         <label for="productName">Product Name:</label>
         <input type="text" id="productName" name="productName" required><br>
 
@@ -20,25 +24,22 @@
         <label for="price">Price:</label>
         <input type="number" id="price" name="price" step="0.01" required><br>
 
-        <label for="images">Images:</label>
-        <input type="file" id="images" name="images" accept="image/*" multiple required><br>
+        <label for="categoryName">Category:</label>
+        <select id="categoryName" name="categoryName">
+    <option value="" disabled selected>Select or Add Category</option>
+    <!-- Java code to retrieve and populate categories from the database -->
+    <%
+        List<String> categories = DatabaseManager.retrieveCategoriesFromDatabase(); // Corrected method call
+        for (String category : categories) {
+    %>
+    <option value="<%= category %>"> <%= category %></option>
+    <%
+        }
+    %>
+</select><br>
 
-        <label for="category">Category:</label>
-        <select id="category" name="category">
-            <option value="" disabled selected>Select or Add Category</option>
-            <!-- Java code to retrieve and populate categories from the database -->
-            <% 
-                List<String> categories = databasemanager.DatabaseManager.retrieveCategoriesFromDatabase();// Implement this method
-                for (String category : categories) {
-            %>
-            <option value="<%= category %>"><%= category %></option>
-            <%
-                }
-            %>
-        </select><br>
-
-        <label for="newCategory">New Category:</label>
-        <input type="text" id="newCategory" name="newCategory"><br>
+        <label for="CategoryName">New Category:</label>
+        <input type="text" id="CategoryName" name="CategoryName"><br>
 
         <!-- Other form fields (e.g., additional details) -->
 

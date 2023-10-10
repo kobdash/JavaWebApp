@@ -24,6 +24,10 @@
         <servlet-name>StudentServlet</servlet-name>
         <servlet-class>saagnik.StudentServlet</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>AddImagesServlet</servlet-name>
+        <servlet-class>servlets.AddImagesServlet</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>AddProductServlet</servlet-name>
         <url-pattern>/AddProductServlet</url-pattern>
@@ -47,6 +51,10 @@
     <servlet-mapping>
         <servlet-name>StudentServlet</servlet-name>
         <url-pattern>/StudentServlet</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>AddImagesServlet</servlet-name>
+        <url-pattern>/AddImagesServlet</url-pattern>
     </servlet-mapping>
     <session-config>
         <session-timeout>
