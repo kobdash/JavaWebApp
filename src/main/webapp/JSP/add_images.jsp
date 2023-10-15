@@ -7,16 +7,15 @@
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <!DOCTYPE html>
 <html>
-    <head>
-        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-        <title>Add images</title>
-    </head>
-    <body>
-        
-   <form action="AddImagesServlet" method="post"  enctype="multipart/form-data">
-    <input type="file" name="images[]" multiple>
-    <input type="submit" value="Upload Images">
-   </form>
-        
-    </body>
+<head>
+    <title>Upload Product Images</title>
+</head>
+<body>
+    <h1>Upload Product Images</h1>
+    <form action="UploadImagesServlet" method="post" enctype="multipart/form-data">
+        <input type="hidden" name="product_id" value="${product_id}">
+        <input type="file" name="images" multiple="multiple">
+        <input type="submit" value="Upload">
+    </form>
+</body>
 </html>

@@ -1,6 +1,6 @@
 /*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt 
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java 
  */
 
 
@@ -17,6 +17,7 @@ public class Product {
     private double price;
     private String categoryName;
     private List<String> imageUrls;
+    private int categoryId;
 
     // Constructors
     public Product() {
@@ -118,9 +119,14 @@ public class Product {
      public String getCategoryName() {
         return categoryName;
     }
+     
+    public int getCategoryId() {
+        return categoryId;
+    }
 
-    public void setCategoryId(String categoryName) {
-        this.categoryName = categoryName;
+
+    public void setCategoryId(int categoryId) {
+        this.categoryId = categoryId;
     }
 
 

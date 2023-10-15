@@ -29,7 +29,7 @@
     <option value="" disabled selected>Select or Add Category</option>
     <!-- Java code to retrieve and populate categories from the database -->
     <%
-        List<String> categories = DatabaseManager.retrieveCategoriesFromDatabase(); // Corrected method call
+        List<String> categories = retrieveCategoriesFromDatabase(); // Corrected method call
         for (String category : categories) {
     %>
     <option value="<%= category %>"> <%= category %></option>
