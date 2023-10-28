@@ -7,9 +7,15 @@
     <listener>
         <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
     </listener>
-    <servlet>
-        <servlet-name>AddProductServlet</servlet-name>
-        <servlet-class>servlets.AddProductServlet</servlet-class>
+   <servlet>
+    <servlet-name>AddProductServlet</servlet-name>
+    <servlet-class>servlets.AddProductServlet</servlet-class>
+    <multipart-config>
+        <location>/tmp</location> <!-- Specify a temporary location for file uploads -->
+        <max-file-size>20848820</max-file-size> <!-- Specify the maximum file size allowed -->
+        <max-request-size>418018841</max-request-size> <!-- Specify the maximum request size allowed -->
+        <file-size-threshold>1048576</file-size-threshold> <!-- Specify a threshold for in-memory storage -->
+    </multipart-config>
     </servlet>
     <servlet>
         <servlet-name>java</servlet-name>
@@ -30,10 +36,6 @@
     <servlet>
         <servlet-name>StudentServlet</servlet-name>
         <servlet-class>saagnik.StudentServlet</servlet-class>
-    </servlet>
-    <servlet>
-        <servlet-name>AddImagesServlet</servlet-name>
-        <servlet-class>servlets.AddImagesServlet</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>dispatcher</servlet-name>
@@ -63,10 +65,6 @@
     <servlet-mapping>
         <servlet-name>StudentServlet</servlet-name>
         <url-pattern>/StudentServlet</url-pattern>
-    </servlet-mapping>
-    <servlet-mapping>
-        <servlet-name>AddImagesServlet</servlet-name>
-        <url-pattern>/AddImagesServlet</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
         <servlet-name>dispatcher</servlet-name>

@@ -66,35 +66,27 @@
         <form action="HomeServlet" method="post">
             <label for="searchQuery">Search:</label>
             <input type="text" id="searchQuery" name="searchQuery">
-            <label for="categoryId">Category:</label>
-            <label for="categoryName">Category:</label>
-            <!-- Add a dropdown for selecting a category if needed -->
-            <select id="categoryId" name="categoryId">
-                <!-- Populate the dropdown options with categories if necessary -->
-                 <option value="0">Select Category</option>
-                <option value="1">Category 1</option>
-                <option value="2">Category 2</option>
+            
+  
+        
             <select id="categoryName" name="categoryName">
-
-                  <option value="" disabled selected>Select Category</option>
-                 <!-- Java code to retrieve and populate categories from the database -->
-            <% 
-                List<String> categories = databasemanager.DatabaseManager.retrieveCategoriesFromDatabase();// Implement this method
-                for (String category : categories) {
-            %>
-            <option value="<%= category %>"><%= category %></option>
-            <%
-                }
-            %>
-                <!-- Add more options as needed -->
+             <option value="" disabled selected>Select Category</option>
+                 <option value="Laptops">Laptops</option>
+                <option value="TVs">TVs</option>
+                <option value="Phones">Phones</option>
             </select>
-            <label for="minPrice">Min Price:</label>
-            <input type="text" id="minPrice" name="minPrice">
-            <label for="maxPrice">Max Price:</label>
-            <input type="text" id="maxPrice" name="maxPrice">
-            <button type="submit">Search</button>
+            
+      <label for="minPrice">Min Price:</label>
+        <input type="text" id="minPrice" name="minPrice" value="0"> 
+
+        <label for="maxPrice">Max Price:</label>
+        <input type="text" id="maxPrice" name="maxPrice" value="10000">
+        
+        <button type="submit">Search</button>
         </form>
     </div>
+    
+    <h3><a href="/AddProductServlet">Click to Add Product</a></h3>
 </body>
 </html>
 

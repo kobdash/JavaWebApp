@@ -8,14 +8,15 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.Part;
 import java.io.IOException;
+import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.ArrayList;
-import java.util.List;
+
 
 
 
@@ -29,30 +30,40 @@ import java.util.List;
     }
 
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-        // Retrieve product information from the request parameters
-        String productName = request.getParameter("productName");
-        String description = request.getParameter("description");
-        String pricestr = request.getParameter("price");
-        double price = Double.parseDouble(pricestr);
-        String categoryName = request.getParameter("categoryName");
-       
+        throws ServletException, IOException {
+    // Retrieve product information from the request parameters
+    String productName = request.getParameter("productName");
+    String description = request.getParameter("description");
+    String pricestr = request.getParameter("price");
+    double price = Double.parseDouble(pricestr);
+    String categoryName= request.getParameter("categoryName");
+   
+    
 
-  
+// Handle image upload
+    Part filePart = request.getPart("image");
+    InputStream imageInputStream = filePart.getInputStream();
 
-        // Add the product and image data to the database
-        Product product = new Product(productName, description, price, categoryName);
-        boolean productAdded = addProductToProductsTable(product);
+    // Add the product and image data to the database
+    Product product = new Product(productName, description, price, categoryName);
 
-        if (productAdded) {
-                response.getWriter().write("Product added successfully!");
-                request.getRequestDispatcher("/JSP/add_images.jsp").forward(request, response);
-            } else {
-                response.getWriter().write("Error saving the image data.");
-            }
- 
-       
+    boolean productAdded = addProductToProductsTable(product);
+
+    if (productAdded) {
+        int productId = getProductIDFromDatabase(productName); // Implement this method to retrieve the product ID
+
+        boolean imageAdded = addProductImageToTable(productId, imageInputStream);
+
+        if (imageAdded) {
+            response.getWriter().write("Product and image added successfully!");
+          
+        } else {
+            response.getWriter().write("Error saving the image data.");
+        }
+    } else {
+        response.getWriter().write("Error adding the product.");
     }
+}
     
     public static boolean addProductToProductsTable(Product product) {
     Connection connection = null;
@@ -113,22 +124,59 @@ import java.util.List;
 
     return false; // Error occurred or product not added
 }
-   public static boolean addProductToCategoriesTable(String categoryName) {
+
+ 
+    public static int getProductIDFromDatabase(String productName) {
+    Connection connection = null;
+    PreparedStatement preparedStatement = null;
+    ResultSet resultSet = null;
+    int productId = -1; // Initialize to a default value
+
+    try {
+        connection = getConnection();
+
+        // Query to retrieve the product ID based on the product name
+        String query = "SELECT product_id FROM products WHERE product_name = ?";
+        preparedStatement = connection.prepareStatement(query);
+        preparedStatement.setString(1, productName);
+        resultSet = preparedStatement.executeQuery();
+
+        if (resultSet.next()) {
+            productId = resultSet.getInt("product_id");
+        }
+    } catch (SQLException e) {
+        e.printStackTrace();
+        // Handle database-related exceptions here
+    } finally {
+        // Close resources
+        try {
+            if (resultSet != null) resultSet.close();
+            if (preparedStatement != null) preparedStatement.close();
+            if (connection != null) connection.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    return productId;
+}
+    
+    public static boolean addProductImageToTable(int productId, InputStream imageInputStream) {
     Connection connection = null;
     PreparedStatement preparedStatement = null;
 
     try {
         connection = getConnection();
 
-        // Add the category to the 'categories' table
-        String insertCategorySQL = "INSERT INTO categories (category_name) VALUES (?)";
-        preparedStatement = connection.prepareStatement(insertCategorySQL);
+        // Query to insert image data into the "product_images" table
+        String insertImageSQL = "INSERT INTO product_images (image_data, product_id) VALUES (?, ?)";
+        preparedStatement = connection.prepareStatement(insertImageSQL);
 
-        preparedStatement.setString(1, categoryName);
+        preparedStatement.setBlob(1, imageInputStream);
+        preparedStatement.setInt(2, productId);
 
         int rowsAffected = preparedStatement.executeUpdate();
 
-        // Check if the category was added successfully
         return rowsAffected > 0;
     } catch (SQLException e) {
         e.printStackTrace();
@@ -143,42 +191,9 @@ import java.util.List;
         }
     }
 
-    return false; // Error occurred or category not added
+    return false; // Error occurred or image not added
 }
- 
-    public static List<String> retrieveCategoriesFromDatabase() {
-        List<String> categories = new ArrayList<>();
-        Connection connection = null;
-        PreparedStatement preparedStatement = null;
-        ResultSet resultSet = null;
-
-        try {
-            connection = getConnection();
-            String query = "SELECT category_name FROM categories"; // Replace with your table name and column name
-            preparedStatement = connection.prepareStatement(query);
-            resultSet = preparedStatement.executeQuery();
-
-            while (resultSet.next()) {
-                String categoryName = resultSet.getString("category_name"); // Replace with your column name
-                categories.add(categoryName);
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-            // Handle database-related exceptions here
-        } finally {
-            // Close resources
-            try {
-                if (resultSet != null) resultSet.close();
-                if (preparedStatement != null) preparedStatement.close();
-                if (connection != null) connection.close();
-            } catch (SQLException e) {
-                e.printStackTrace();
-                // Handle the exception as needed
-            }
-        }
-
-        return categories;
-    } 
+    
     
 }
 

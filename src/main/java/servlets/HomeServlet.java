@@ -39,12 +39,14 @@ public class HomeServlet extends HttpServlet {
         }
     }
 
-    // ... (other methods and code)
+
 
 
   protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
     try {
+        
+        
         // Retrieve search parameters from the request
         String productName = request.getParameter("searchQuery");
         String categoryName =  request.getParameter("categoryName");
@@ -57,15 +59,19 @@ public class HomeServlet extends HttpServlet {
  
           List<Product> searchResults = new ArrayList<>();
         
-        if (!productName.isEmpty()) {
+        if (productName != null && !productName.isEmpty()) {
     searchResults = searchByName(productName);
         }
-        else if (!categoryName.isEmpty()) {
+        else if(categoryName != null && !categoryName.isEmpty()) {
     searchResults = searchByCategory(categoryName);
 }
-       else if (minPrice != 0.0 && maxPrice != 0.0) {
+       else {
     searchResults = searchByPriceRange(minPrice, maxPrice);
 }
+       
+ 
+        
+        
      request.setAttribute("products", searchResults);
 
         // Forward the request to the "home.jsp" page for display
@@ -121,6 +127,7 @@ public class HomeServlet extends HttpServlet {
   
   public static List<Product> searchByName(String productName) {
     List<Product> searchResults = new ArrayList<>();
+  
 
     try (Connection connection = getConnection()) {
         String sql = "SELECT * FROM products WHERE LOWER(product_name) LIKE LOWER(?)";
@@ -154,7 +161,7 @@ public class HomeServlet extends HttpServlet {
     List<Product> searchResults = new ArrayList<>();
 
     try (Connection connection = getConnection()) {
-        String sql = "SELECT * FROM products WHERE category_id = ?";
+        String sql = "SELECT * FROM products WHERE category_name = ?";
         
         try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
             preparedStatement.setString(1, categoryName);
@@ -166,9 +173,9 @@ public class HomeServlet extends HttpServlet {
                 String productName = resultSet.getString("product_name");
                 String description = resultSet.getString("description");
                 double price = resultSet.getDouble("price");
-               String categoryNameFromDB = resultSet.getString("category_name");
+              
 
-              Product product = new Product(productId, productName, description, price, categoryNameFromDB);
+              Product product = new Product(productId, productName, description, price, categoryName);
                 searchResults.add(product);
             }
         }
@@ -179,7 +186,8 @@ public class HomeServlet extends HttpServlet {
 
     return searchResults;
 }
-
+ 
+  
   
   public static List<Product> searchByPriceRange(double minPrice, double maxPrice) {
     List<Product> searchResults = new ArrayList<>();
@@ -198,9 +206,9 @@ public class HomeServlet extends HttpServlet {
                 String productName = resultSet.getString("product_name");
                 String description = resultSet.getString("description");
                 double price = resultSet.getDouble("price");
-                String categoryNameFromDB = resultSet.getString("category_name");
+                String categoryName = resultSet.getString("category_name");
 
-                 Product product = new Product(productId, productName, description, price, categoryNameFromDB);
+                 Product product = new Product(productId, productName, description, price, categoryName);
                 searchResults.add(product);
             }
         }

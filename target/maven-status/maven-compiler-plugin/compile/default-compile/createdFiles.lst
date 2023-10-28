@@ -2,8 +2,6 @@ servlets/AddProductServlet.class
 com/mycompany/javaweb/JakartaRestConfiguration.class
 model/Product.class
 servlets/HomeServlet.class
-servlets/AddImagesServlet.class
 servlets/ProductDetailsServlet.class
 com/mycompany/javaweb/resources/JakartaEE10Resource.class
-servlets/OutputStream.class
 databasemanager/DatabaseManager.class
