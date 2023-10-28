@@ -55,7 +55,9 @@ import java.sql.Statement;
         boolean imageAdded = addProductImageToTable(productId, imageInputStream);
 
         if (imageAdded) {
+           
             response.getWriter().write("Product and image added successfully!");
+            
           
         } else {
             response.getWriter().write("Error saving the image data.");

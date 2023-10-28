@@ -19,38 +19,13 @@ public class Product {
     private List<String> imageUrls;
     private int categoryId;
 
-    // Constructors
+
     public Product() {
         // Default constructor
     }
     
 
-    
-    public Product(String productName, String description, double price, String categoryName) {
-        this.productName = productName;
-        this.description = description;
-        this.price = price;
-        this.categoryName = categoryName;
-    }
-    
-    public Product(String productName, String description,double price){
-     this.productName = productName;
-        this.description = description;
-        this.price = price;
-    
-    }
-    
-   
-
-    public Product(int productId, String productName, String description, double price, String categoryName) {
-        this.productId = productId;
-        this.productName = productName;
-        this.description = description;
-        this.price = price;
-        this.categoryName = categoryName;
-    }
-    
-    
+    //vontructors
     public Product(int productId, String productName, String description, double price, String categoryName, List<String> imageUrls) {
         this.productId = productId;
         this.productName = productName;
@@ -60,18 +35,30 @@ public class Product {
         this.imageUrls = imageUrls;
     }
     
-    
-    
-    public Product(String productName, String description, double price, String categoryName, List<String> imageUrls) {
+    public Product(int productId, String productName, String description, double price, String categoryName){
+        this.productId = productId;
         this.productName = productName;
         this.description = description;
         this.price = price;
         this.categoryName = categoryName;
-        this.imageUrls = imageUrls;
-    }
-
-
-
+    
+    };
+    
+    public Product(String productName, String description, double price, String categoryName){
+        
+        this.productName = productName;
+        this.description = description;
+        this.price = price;
+        this.categoryName = categoryName;
+    
+    };
+    
+    public Product(int productId, String productName, double price, String categoryName){
+        this.productId = productId;
+        this.productName = productName;
+        this.price = price;
+        this.categoryName = categoryName;
+    };
 
     // Getters and setters
     

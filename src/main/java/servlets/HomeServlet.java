@@ -99,12 +99,11 @@ public class HomeServlet extends HttpServlet {
             while (resultSet.next()) {
                 int productId = resultSet.getInt("product_id"); // Replace with actual column names
                 String productName = resultSet.getString("product_name");
-                String description = resultSet.getString("description");
                 double price = resultSet.getDouble("price");
                 String categoryName = resultSet.getString("category_name");
 
                 // Create a Product object and add it to the list
-                Product product = new Product(productId, productName, description, price, categoryName);
+                Product product = new Product(productId, productName, price, categoryName);
                 products.add(product);
             }
         } catch (SQLException e) {
@@ -141,11 +140,10 @@ public class HomeServlet extends HttpServlet {
             while (resultSet.next()) {
                 int productId = resultSet.getInt("product_id");
                 String productNameFromDB = resultSet.getString("product_name");
-                String description = resultSet.getString("description");
                 double price = resultSet.getDouble("price");
                 String categoryNameFromDB = resultSet.getString("category_name");
 
-                Product product = new Product(productId, productNameFromDB, description, price, categoryNameFromDB);
+                Product product = new Product(productId, productNameFromDB, price, categoryNameFromDB);
                 searchResults.add(product);
             }
         }
@@ -204,11 +202,10 @@ public class HomeServlet extends HttpServlet {
             while (resultSet.next()) {
                 int productId = resultSet.getInt("product_id");
                 String productName = resultSet.getString("product_name");
-                String description = resultSet.getString("description");
                 double price = resultSet.getDouble("price");
                 String categoryName = resultSet.getString("category_name");
 
-                 Product product = new Product(productId, productName, description, price, categoryName);
+                 Product product = new Product(productId, productName, price, categoryName);
                 searchResults.add(product);
             }
         }

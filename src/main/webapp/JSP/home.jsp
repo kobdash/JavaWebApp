@@ -12,11 +12,8 @@
     <h1>Product List</h1>
     <table border="1">
         <tr>
-            <th>Product ID</th>
             <th>Product Name</th>
-            <th>Description</th>
             <th>Price</th>
-            <th>Category ID</th>
             <th>Category Name</th>
         </tr>
         <% 
@@ -40,12 +37,9 @@
                 Product product = products.get(i);
         %>
            <tr>
-                <td><%= product.getProductId() %></td>
                 <!-- Make the product name clickable -->
                 <td><a href="ProductDetailsServlet?productId=<%= product.getProductId() %>"><%= product.getProductName() %></a></td>
-                <td><%= product.getDescription() %></td>
                 <td><%= product.getPrice() %></td>
-                <td><%= product.getCategoryId() %></td>
                 <td><%= product.getCategoryName() %></td>
             </tr>
         <% } %>
@@ -62,6 +56,9 @@
         %>
     </div>
     
+    
+    </br>
+    </br>
     <div>
         <form action="HomeServlet" method="post">
             <label for="searchQuery">Search:</label>
